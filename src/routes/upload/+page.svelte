@@ -6,40 +6,41 @@
 	import { createSubtitle } from '../../api/createSubtitle';
 	import { formatFileSize } from '../../helpers/formatFileSize';
 	import type { Subtitle } from '../../types/Subtitle';
+	import { debounce } from 'lodash';
 
-	//Constants
+	// Constants
 	let iconSize = '4rem';
 
 	// State variables
 	let isFormSubmitted = false;
 	let loading = false;
 	let featureType = FeatureType.Episode;
-	let fileInput: FileList | undefined = undefined;
+	let fileInput: File | undefined = undefined;
 	let response: Subtitle | undefined = undefined;
 
 	// Input data
-	let input: Partial<CreateSubtitleInput> = {
+	let input = {
 		imdbId: '',
 		comments: '',
 		language: 'en',
 		releaseName: '',
 		episodeNumber: '',
-		seasonNumber: ''
+		seasonNumber: '',
+		file: undefined as File | undefined
 	};
 
 	// Event handler for input change
-	function handleInputChange(event: Event) {
+	const handleInputChange = debounce((event: Event) => {
 		const target = event.target as HTMLInputElement;
 		featureType = target.value as FeatureType;
-	}
+	}, 300);
 
 	// Event handler for form submission
 	async function handleSubmit() {
 		loading = true;
 
-		input.file = fileInput?.item(0) ?? undefined;
-
-		if (input.file) {
+		if (fileInput) {
+			input.file = fileInput;
 			const formData = createFormData(input);
 			response = await createSubtitle(formData);
 		}
@@ -49,7 +50,7 @@
 	}
 
 	// Helper function to create FormData
-	function createFormData(input: Partial<CreateSubtitleInput>): FormData {
+	function createFormData(input: CreateSubtitleInput): FormData {
 		const formData = new FormData();
 
 		// TODO: Add validation
@@ -139,7 +140,7 @@
 
 				<FileDropzone
 					name="files"
-					bind:files={fileInput}
+					bind:file={fileInput}
 					accept=".srt"
 					multiple={false}
 					class={fileInput !== undefined ? 'border-2 border-dashed' : 'border-solid'}
@@ -154,8 +155,8 @@
 					<svelte:fragment slot="message">
 						{#if fileInput !== undefined}
 							<div>
-								File: {fileInput[0].name} |
-								{formatFileSize(fileInput[0].size)}
+								File: {fileInput.name} |
+								{formatFileSize(fileInput.size)}
 							</div>
 						{:else}
 							Upload a file or drop it here
