@@ -1,9 +1,9 @@
 export interface CreateSubtitleInput {
-	file: File;
-	releaseName: string;
-	comments?: string;
-	language: string;
 	imdbId: string;
-	seasonNumber?: string;
-	episodeNumber?: string;
+	comments: string;
+	language: string;
+	releaseName: string;
+	episodeNumber: string;
+	seasonNumber: string;
+	file?: File;
 }
