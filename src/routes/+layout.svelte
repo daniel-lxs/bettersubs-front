@@ -16,7 +16,7 @@
 		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">Better Subs</strong>
+				<strong class="h1 text-xl uppercase">Better Subs</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
@@ -33,9 +33,9 @@
 	<svelte:fragment slot="sidebarLeft">
 		<AppRail>
 			<svelte:fragment slot="lead">
-				<AppRailAnchor href="/">Home</AppRailAnchor>
-				<AppRailAnchor href="/search">Search</AppRailAnchor>
-				<AppRailAnchor href="/upload">Upload</AppRailAnchor>
+				<AppRailAnchor class="h2" href="/">Home</AppRailAnchor>
+				<AppRailAnchor class="h2" href="/search">Search</AppRailAnchor>
+				<AppRailAnchor class="h2" href="/upload">Upload</AppRailAnchor>
 			</svelte:fragment>
 		</AppRail>
 	</svelte:fragment>

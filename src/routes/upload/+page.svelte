@@ -16,7 +16,6 @@
 	let loading = false;
 	let featureType = FeatureType.Episode;
 	let fileInput: File | undefined = undefined;
-	let response: Subtitle | undefined = undefined;
 
 	// Input data
 	let input = {
@@ -42,7 +41,7 @@
 		if (fileInput) {
 			input.file = fileInput;
 			const formData = createFormData(input);
-			response = await createSubtitle(formData);
+			await createSubtitle(formData);
 		}
 
 		loading = false;
@@ -70,7 +69,7 @@
 {#if !isFormSubmitted}
 	<div class="card p-6">
 		<header class="card-header">
-			<h3 class="text-3xl font-bold mb-4">Upload Subtitle</h3>
+			<h2 class="h2">Upload Subtitle</h2>
 		</header>
 		<section class="p-4">
 			<form on:submit|preventDefault={handleSubmit}>
@@ -178,7 +177,7 @@
 {:else}
 	<div class="card p-6">
 		<header class="card-header">
-			<h3 class="text-4xl font-bold mb-4">Your Subtitle was Uploaded Successfully</h3>
+			<h3 class="h3">Your Subtitle was Uploaded Successfully</h3>
 		</header>
 
 		<section class="p-4">

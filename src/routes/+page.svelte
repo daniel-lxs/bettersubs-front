@@ -1,5 +1,5 @@
 <div class="card p-6">
-	<h1 class="text-4xl font-bold mb-4">Better Subs</h1>
+	<h1 class="h1">Better Subs</h1>
 
 	<p class="text-lg mb-6">
 		Welcome to Better Subs, your go-to destination for finding subtitles for movies and TV shows.
@@ -8,7 +8,7 @@
 	</p>
 
 	<section class="mb-8">
-		<h2 class="text-2xl font-bold mb-4">How It Works</h2>
+		<h3 class="h3">How It Works</h3>
 		<p class="">
 			1. Simply enter the name of the movie or TV show you need subtitles for in the search page.
 		</p>
@@ -17,7 +17,7 @@
 	</section>
 
 	<section class="mb-8">
-		<h2 class="text-2xl font-bold mb-4">Key Features</h2>
+		<h3 class="h3">Key Features</h3>
 		<ul class="list-disc list-inside">
 			<li>Extensive database covering a wide range of movies and TV shows.</li>
 			<li>Easy-to-use search functionality for quick subtitle access.</li>
@@ -27,7 +27,7 @@
 	</section>
 
 	<section>
-		<h2 class="text-2xl font-bold mb-4">Get Started</h2>
+		<h3 class="h3">Get Started</h3>
 		<p class="">Ready to enhance your viewing experience? Start using Better Subs today!</p>
 		<a
 			href="#your-link-to-get-started"

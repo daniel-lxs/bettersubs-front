@@ -7,7 +7,7 @@
 
 <div class="card p-6">
 	<header class="card-header">
-		<h3 class="text-3xl font-bold mb-4">Results</h3>
+		<h2 class="h2">Results</h2>
 	</header>
 	<section class="p-4">
 		<div class="table-container">
