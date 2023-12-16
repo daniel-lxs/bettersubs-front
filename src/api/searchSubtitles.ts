@@ -4,12 +4,12 @@ import type { SearchSubtitlesInput } from '../types/SearchSubtitlesInput';
 import type { Subtitle } from '../types/Subtitle';
 
 export async function searchSubtitles(input: SearchSubtitlesInput): Promise<Subtitle[]> {
-	console.log(input);
-	const baseUrl = PUBLIC_API_BASE_URL;
-	const response = await axios.post<Subtitle[]>(`${baseUrl}/subtitle/search`, input);
-
-	if (response && response.status === 200) {
-		return response.data;
+	try {
+		const baseUrl = PUBLIC_API_BASE_URL;
+		const response = await axios.post<Subtitle[]>(`${baseUrl}/subtitle/search`, input);
+		return response.status === 200 ? response.data : [];
+	} catch (error) {
+		console.error('Error searching subtitles:', error);
+		return [];
 	}
-	return [];
 }
