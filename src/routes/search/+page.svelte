@@ -6,5 +6,5 @@
 	let subtitles: Subtitle[] = [];
 </script>
 
-<SearchSubtitleForm bind:resultArray={subtitles} />
+<SearchSubtitleForm bind:subtitles />
 <SubtitlesTable bind:subtitles />
