@@ -1,129 +1,170 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { Frown, Search, XCircle } from 'lucide-svelte';
+	import { Search } from 'lucide-svelte';
 	import { searchSubtitles } from '../api/searchSubtitles';
 	import type { SearchSubtitlesInput } from '../types/SearchSubtitlesInput';
 	import type { Subtitle } from '../types/Subtitle';
 	import { FeatureType } from '../types/FeatureTypes';
+	import Alert from './Alert.svelte';
 
-	export let resultArray: Subtitle[];
+	export let subtitles: Subtitle[] = [];
 
-	let isAlertVisible = false;
-	let loading = false;
+	let alertVisible = false;
+	let isLoading = false;
+	let isFormValid = false;
+	let alert = {
+		title: '',
+		message: ''
+	};
 
-	const iconSize = '2rem';
-
-	let searchFormData: SearchSubtitlesInput = {
+	let searchForm: SearchSubtitlesInput = {
 		imdbId: '',
 		language: 'en',
 		query: '',
 		featureType: 'episode'
 	};
 
-	let episodeNumber: string | undefined;
-	let seasonNumber: string | undefined;
+	let validationErrors = {
+		imdbId: false,
+		seasonNumber: false,
+		episodeNumber: false
+	};
 
-	async function fetchData() {
-		loading = true;
+	let episodeNumber = '';
+	let seasonNumber = '';
 
-		if (searchFormData.featureType === 'episode' && episodeNumber && seasonNumber) {
-			searchFormData.episodeNumber = parseInt(episodeNumber);
-			searchFormData.seasonNumber = parseInt(seasonNumber);
-		}
-
-		resultArray = await searchSubtitles(searchFormData);
-
-		if (resultArray.length < 1) {
-			await handleAlert();
-		}
-
-		loading = false;
+	// Validation functions
+	function validateImdbId() {
+		validationErrors.imdbId = !searchForm.imdbId;
+		updateFormValidity();
 	}
 
-	async function handleAlert() {
-		if (!isAlertVisible) {
-			isAlertVisible = true;
-			await new Promise((resolve) =>
-				setTimeout(() => {
-					isAlertVisible = false;
-					resolve(null);
-				}, 3000)
-			);
+	function validateSeasonAndEpisodeNumbers() {
+		if (searchForm.featureType === 'episode') {
+			validationErrors.seasonNumber = !seasonNumber;
+			validationErrors.episodeNumber = !episodeNumber;
 		}
-		isAlertVisible = false;
+		updateFormValidity();
+	}
+
+	// Update the overall form validity
+	function updateFormValidity() {
+		const { imdbId, seasonNumber, episodeNumber } = validationErrors;
+		const isEpisode = searchForm.featureType === 'episode';
+		const isValid = !imdbId && !(isEpisode && (seasonNumber || episodeNumber));
+		isFormValid = isValid;
+		return isValid;
+	}
+
+	async function fetchData() {
+		validateImdbId();
+		validateSeasonAndEpisodeNumbers();
+
+		if (!updateFormValidity()) {
+			return;
+		}
+
+		isLoading = true;
+		alert.message = ''; // Clear the alert message before fetching
+		alertVisible = false; // Hide the alert before fetching
+
+		if (searchForm.featureType === 'episode' && episodeNumber && seasonNumber) {
+			searchForm.episodeNumber = parseInt(episodeNumber);
+			searchForm.seasonNumber = parseInt(seasonNumber);
+		}
+
+		try {
+			subtitles = await searchSubtitles(searchForm);
+
+			if (subtitles.length === 0) {
+				setAlert(
+					'No subtitles found',
+					'No results found. Please try again with different search criteria.'
+				);
+				alertVisible = true;
+			}
+		} catch (error) {
+			setAlert('Error', 'An error occurred while fetching data. Please try again later.');
+			alertVisible = true;
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	function setAlert(title: string, message: string) {
+		alert.title = title;
+		alert.message = message;
 	}
 </script>
 
+<Alert bind:visible={alertVisible} bind:title={alert.title} bind:message={alert.message} />
+
 <div class="card p-6">
 	<header class="card-header">
-		{#if isAlertVisible}
-			<div class="alert-overlay">
-				<aside class="alert variant-filled-error" transition:fade|local={{ duration: 200 }}>
-					<!-- Icon -->
-					<div><Frown size={iconSize} /></div>
-					<!-- Message -->
-					<div class="alert-message">
-						<h3 class="h3">No Results</h3>
-						<p>Try changing your search criteria</p>
-					</div>
-					<!-- Actions -->
-					<div class="alert">
-						<button class="btn-icon variant-filled-error" on:click={handleAlert}><XCircle /></button
-						>
-					</div>
-				</aside>
-			</div>
-		{/if}
-		<h3 class="text-3xl font-bold mb-4">Search Subtitles</h3>
+		<h2 class="h2">Search Subtitles</h2>
 	</header>
 	<section class="p-4">
 		<!--Create 2 columns -->
-		<div>
-			<label class="label">
-				<span>IMDb ID</span>
-				<input
-					class="input short-input"
-					type="text"
-					placeholder="tt1234567"
-					bind:value={searchFormData.imdbId}
-				/>
-			</label>
-			<label class="label">
-				<span>Query</span>
-				<input
-					class="input"
-					type="text"
-					placeholder="PROPER.HDTV.x264-KILLERS"
-					bind:value={searchFormData.query}
-				/>
-			</label>
-			<label class="label">
-				<span>Language</span>
-				<select class="select" bind:value={searchFormData.language}>
-					<option value="es">Spanish</option>
-					<option value="en">English</option>
-				</select>
-			</label>
-			<label class="label">
-				<span>Feature Type</span>
-				<select class="select" bind:value={searchFormData.featureType}>
-					<option value={FeatureType.Episode}>TV Show</option>
-					<option value={FeatureType.Movie}>Movie</option>
-				</select>
-			</label>
-			{#if searchFormData.featureType === 'episode'}
+		<div class="flex justify-center items-center mx-auto transition-[width] duration-200 w-full">
+			<div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
 				<label class="label">
-					<span>Season Number</span>
-					<input class="input" type="text" placeholder="14" bind:value={seasonNumber} />
+					<span>IMDb ID</span>
+					<input
+						class="input {validationErrors.imdbId ? 'input-error' : ''}"
+						type="text"
+						placeholder="tt1234567"
+						bind:value={searchForm.imdbId}
+						on:blur={validateImdbId}
+					/>
 				</label>
 				<label class="label">
-					<span>Episode Number</span>
-					<input class="input" type="text" placeholder="8" bind:value={episodeNumber} />
+					<span>Query</span>
+					<input
+						class="input"
+						type="text"
+						placeholder="PROPER.HDTV.x264-KILLERS"
+						bind:value={searchForm.query}
+					/>
 				</label>
-			{/if}
+				<label class="label">
+					<span>Language</span>
+					<select class="select" bind:value={searchForm.language}>
+						<option value="es">Spanish</option>
+						<option value="en">English</option>
+					</select>
+				</label>
+				<label class="label">
+					<span>Feature Type</span>
+					<select class="select" bind:value={searchForm.featureType}>
+						<option value={FeatureType.Episode}>TV Show</option>
+						<option value={FeatureType.Movie}>Movie</option>
+					</select>
+				</label>
+				{#if searchForm.featureType === 'episode'}
+					<label class="label">
+						<span>Season Number</span>
+						<input
+							class="input {validationErrors.seasonNumber ? 'input-error' : ''}"
+							type="text"
+							placeholder="14"
+							bind:value={seasonNumber}
+							on:blur={validateSeasonAndEpisodeNumbers}
+						/>
+					</label>
+					<label class="label">
+						<span>Episode Number</span>
+						<input
+							class="input {validationErrors.episodeNumber ? 'input-error' : ''}"
+							type="text"
+							placeholder="8"
+							bind:value={episodeNumber}
+							on:blur={validateSeasonAndEpisodeNumbers}
+						/>
+					</label>
+				{/if}
+			</div>
 		</div>
-		<button type="button" class="btn variant-filled" on:click={fetchData}>
-			{#if loading}
+		<button type="button" class="btn variant-filled" on:click={fetchData} disabled={!isFormValid}>
+			{#if isLoading}
 				<span>Loading...</span>
 			{:else}
 				<span><Search /></span>
