@@ -20,7 +20,7 @@
 		imdbId: '',
 		language: 'en',
 		query: '',
-		featureType: 'episode'
+		featureType: FeatureType.Episode
 	};
 
 	let validationErrors = {
@@ -32,20 +32,6 @@
 	let episodeNumber = '';
 	let seasonNumber = '';
 
-	// Validation functions
-	function validateImdbId() {
-		validationErrors.imdbId = !searchForm.imdbId;
-		updateFormValidity();
-	}
-
-	function validateSeasonAndEpisodeNumbers() {
-		if (searchForm.featureType === 'episode') {
-			validationErrors.seasonNumber = !seasonNumber;
-			validationErrors.episodeNumber = !episodeNumber;
-		}
-		updateFormValidity();
-	}
-
 	// Update the overall form validity
 	function updateFormValidity() {
 		const { imdbId, seasonNumber, episodeNumber } = validationErrors;
@@ -56,10 +42,9 @@
 	}
 
 	async function fetchData() {
-		validateImdbId();
-		validateSeasonAndEpisodeNumbers();
+		updateFormValidity();
 
-		if (!updateFormValidity()) {
+		if (!isFormValid) {
 			return;
 		}
 
@@ -80,17 +65,16 @@
 					'No subtitles found',
 					'No results found. Please try again with different search criteria.'
 				);
-				alertVisible = true;
 			}
 		} catch (error) {
 			setAlert('Error', 'An error occurred while fetching data. Please try again later.');
-			alertVisible = true;
 		} finally {
 			isLoading = false;
 		}
 	}
 
 	function setAlert(title: string, message: string) {
+		alertVisible = true;
 		alert.title = title;
 		alert.message = message;
 	}
@@ -113,7 +97,6 @@
 						type="text"
 						placeholder="tt1234567"
 						bind:value={searchForm.imdbId}
-						on:blur={validateImdbId}
 					/>
 				</label>
 				<label class="label">
@@ -147,7 +130,6 @@
 							type="text"
 							placeholder="14"
 							bind:value={seasonNumber}
-							on:blur={validateSeasonAndEpisodeNumbers}
 						/>
 					</label>
 					<label class="label">
@@ -157,7 +139,6 @@
 							type="text"
 							placeholder="8"
 							bind:value={episodeNumber}
-							on:blur={validateSeasonAndEpisodeNumbers}
 						/>
 					</label>
 				{/if}
