@@ -6,3 +6,7 @@
   display: block;
   margin-bottom: 2rem;
 }
+
+.validation-error {
+  color: rgb(var(--color-error-500));
+}
