@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Download } from 'lucide-svelte';
-	import type { Subtitle } from '../types/Subtitle';
+	import type { Subtitle } from '../../types/Subtitle';
 
 	export let subtitles: Subtitle[] = [];
 </script>
