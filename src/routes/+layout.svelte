@@ -1,12 +1,12 @@
 <script lang="ts">
 	import '../app.css';
 	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, TabGroup, TabAnchor } from '@skeletonlabs/skeleton';
 	import { AppRail, AppRailAnchor } from '@skeletonlabs/skeleton';
-
-	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
+	import { page } from '$app/stores';
+	import { Home } from 'lucide-svelte';
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>
 
@@ -15,29 +15,32 @@
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
 		<AppBar>
-			<svelte:fragment slot="lead">
-				<strong class="h1 text-xl uppercase">Better Subs</strong>
-			</svelte:fragment>
+			<svelte:fragment slot="lead"
+				><strong class="h1 text-xl uppercase">Better Subs</strong></svelte:fragment
+			>
 			<svelte:fragment slot="trail">
-				<a
-					class="btn btn-sm variant-ghost-surface"
-					href="https://github.com/skeletonlabs/skeleton"
-					target="_blank"
-					rel="noreferrer"
+				<TabGroup
+					justify="justify-center"
+					active="variant-filled-primary"
+					hover="hover:variant-soft-primary"
+					flex="flex-1 lg:flex-none"
+					rounded=""
+					border=""
+					class="bg-surface-100-800-token w-full"
 				>
-					GitHub
-				</a>
+					<TabAnchor href="/" selected={$page.url.pathname === '/'}>
+						<span>Home</span>
+					</TabAnchor>
+					<TabAnchor href="/search" selected={$page.url.pathname === '/search'}>
+						<span>Search</span>
+					</TabAnchor>
+					<TabAnchor href="/upload" selected={$page.url.pathname === '/upload'}>
+						<span>Upload</span>
+					</TabAnchor>
+					<!-- ... -->
+				</TabGroup>
 			</svelte:fragment>
 		</AppBar>
-	</svelte:fragment>
-	<svelte:fragment slot="sidebarLeft">
-		<AppRail>
-			<svelte:fragment slot="lead">
-				<AppRailAnchor class="h2" href="/">Home</AppRailAnchor>
-				<AppRailAnchor class="h2" href="/search">Search</AppRailAnchor>
-				<AppRailAnchor class="h2" href="/upload">Upload</AppRailAnchor>
-			</svelte:fragment>
-		</AppRail>
 	</svelte:fragment>
 	<slot />
 </AppShell>
